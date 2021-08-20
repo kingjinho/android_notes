@@ -78,7 +78,7 @@ android {
 - `R8 uses ProGuard rules files to modify its behavior, better understand app's structure`
     - Meaning that R8 already has its pre-defined behavior
     - Some rules maybe auto-generated, or inherited from app's library dependency
-    - [ProGuard rules files that R8 uses](https://developer.android.com/studio/build/shrink-code#configuration-files)
+    - [ProGuard rules files(config files) that R8 uses](https://developer.android.com/studio/build/shrink-code#configuration-files)
         - Android Studio, Android Gradle Plugin, Library Dependencies...
 
     
@@ -120,7 +120,37 @@ android {
 
 ## Shrink your code
 
-- R8 Starts shrinking code when setting minifyEnabled to `true` 
+- R8 starts shrinking(removing) unnecessary code when setting minifyEnabled to `true`
+    1.  R8 `first looks for entry points` into your app's code `based on R8 config files above`
+    - All classes that Android platform `may use to open app's activity or services`
+    2. From entry points, `R8 inspects code to build a graph of all methods, variables, classes your app will 
+access at runtime`.
+    3. If code is not connected to that graph :point_right: unreachable and removed from the app
+    
+    <img src="./res/tree-shaking.png" alt="R8 using graph to connect and figure out what is not connected" height="500" width="700"/>
+  
+    4. `R8 determines entry points through -keep rules in the project's R8 config files`
+        - `-keep rules to let R8 know what to not discard` when shrinking app, and `consider it as possible entry points`
+    
+        - Android Gradle Plugin and AAPT2 generate keep rules to specify what to keep for us(most of them)
+  
+        - Activities, views, services... 
+
+    - You can still customize it
+
+
+- Customize which code to keep
+    - For most situations, default ProGuard rules file(proguard-android-optimize.txt) is sufficient for
+    R8 to remove only the unused code
+    - Case when R8 has difficult time determining what to remove:
+        - Calling method from Java Native Interface
+        - When your app looks up code at runtime (reflection)
+    - To fix errors and R8 to keep certain code, add `-keep` line in ProGuard rules file or add `@Keep`
+    annotation
+      
+```groovy
+-keep public class MyClass
+```
 
 
 
@@ -155,3 +185,4 @@ android {
 
 
 [NS: R8 from Line](https://engineering.linecorp.com/ko/blog/line-android-app-build-with-r8-compiler/)
+
