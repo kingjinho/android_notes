@@ -61,12 +61,19 @@
 ![Activity lifecycle](./res/activity_lifecycle.png)
 
 - Activity goes through various stages of lifecycle over its lifetime
-1. onCreate()
+- Provides number of callbacks that allow the activity to know that a state has changed
+    - Create, Stop, Resume, Destroy
+    - We define how activity should behave at a given change of state
+    
+1. onCreate(savedInstanceState: Bundle?)
     - `Called when system creates an activity`
     - `Must be implemented`
-    - `Should initialize the essential components` : create views, bind data...
-    - Must call `setContentView()` to define which layout should activity shows to users
     - Not visible to user
+    - `Should initialize the essential components` : create views, bind data...
+    - `Perform things that should happen only once` for the entire life of the activity      
+    - Must call `setContentView()` to define which layout should activity shows to users
+    - savedInstanceState is not null when onSaveInstanceState( ) is called
+    
 2. onStart()
     - Called after `onCreate` and `onRestart()` 
     - `Where activity becomes visible`
@@ -74,12 +81,14 @@
 3. onResume()
     - `Called just before the activity starts interacting with the user`
     - `The activity is at the top of the activity stack, captures all user input`
+    - App stays in this `Resumed state` until something takes focus away from the app
    
 4. onPause()
     - `When activity loses focus (partially visible)`, technically...
         - **Is an indication that the user is leaving the activity and the activity will soon enter the Stopped or Resumed state**      
     - `May continue to update UI if users is expecting` : Music App, Navigation Screen
-    - `Should not use it to save application or user data, to make network calls, database transactions` 
+    - Brief
+        `Should not use it to save application or user data, to make network calls, database transactions` 
     - next: onResume, onStop
     
 5. onStop()
@@ -95,6 +104,16 @@
     - Called before an activity is destroyed
     - Final callback that activity receives
     - Implemented to ensure all resources released
+    
+# Saving and restoring transient UI state
+- When in case of destroy in activity due to normal behavior(user pressing back button) which result in termination of an Activity
+    - Both system's and user's concept matches, thus nothing we can do
+
+- However, if the system destroys due to constraint(config change or memory pressure),
+    - Although activity is gone, but system still remembers that it existed
+    - When user wants to go back to activity, system creates one using set of saved data
+    - instance: saved data that the system uses to restore the previous state
+    
 
 # Links
 [Introduction to Activities](https://developer.android.com/guide/components/activities/intro-activities)
