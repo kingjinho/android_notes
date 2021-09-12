@@ -75,9 +75,69 @@
 
 - `withContext( )` calls the code with the specified coroutine context, suspends until it completes, and return result
 
-## CoroutineScope
+- `If we do not specify which dispatcher, then coroutine follows dispatcher from outer scope's context!`
+    - WHY?
 
-## Coroutine Context
+## Coroutine Scope & Coroutine Context (Important)
+
+- Coroutine Scope
+    - `Responsible for the structure and parent-child relationships between different coroutines`
+
+- Coroutine has to start inside a scope
+
+- Coroutine Context
+    - Stores additional technical information used to run a given coroutine
+        - Such as `coroutine custom name`, `Dispatcher specifying the threads the coroutine should be scheduled on`
+
+- When using `launch, async and runblocking` to start a coroutine, we automatically create the corresponding scope
+    - All these receive lambda and implicit receiver type `coroutieScope`
+    - Coroutines can only start in coroutine scope
+    - `launch, async` are extensions of CoroutineScope, Implicit and explicit receiver(scope) must be passed
+  ```kotlin
+  public fun CoroutineScope.launch(
+    context: CoroutineContext = EmptyCoroutineContext,
+    start: CoroutineStart = CoroutineStart.DEFAULT,
+    block: suspend CoroutineScope.() -> Unit
+  ): Job {
+      val newContext = newCoroutineContext(context)
+      val coroutine = if (start.isLazy)
+      LazyStandaloneCoroutine(newContext, block) else
+      StandaloneCoroutine(newContext, active = true)
+      coroutine.start(start, coroutine, block)
+      return coroutine
+  }
+  
+  public fun <T> CoroutineScope.async(
+    context: CoroutineContext = EmptyCoroutineContext,
+    start: CoroutineStart = CoroutineStart.DEFAULT,
+    block: suspend CoroutineScope.() -> T
+  ): Deferred<T> {
+      val newContext = newCoroutineContext(context)
+      val coroutine = if (start.isLazy)
+      LazyDeferredCoroutine(newContext, block) else
+      DeferredCoroutine<T>(newContext, active = true)
+      coroutine.start(start, coroutine, block)
+      return coroutine
+  }
+    ```
+    - Coroutine started by `runBlocking` is `the only exception`:
+      It is defined as `top-level function, and it blocks current thread`
+        - It is intended to use in `main( )` and tests as a bridge function
+    - Parent-child relationship works through scopes
+        - The child coroutine is started from the scope corresponding the parent coroutine
+    - Possible to create a new scope without starting a new coroutine
+        - Use of `coroutineScope`
+    
+Structured Concurrency
+    - The mechanism providing the structure of coroutine
+    - Benefits
+        - Scope is generally responsible for child coroutines, and their lifetime is attached to the
+    lifetime of the scope
+        - Scope can automatically cancel child coroutines if something goes wrong or user revokes operation
+        - Scope automatically waits for completion of all the child coroutines.
+            - If the scope corresponds to a coroutine, then the parent coroutine does not complete until all
+        the coroutines launched in its scope are complete                
+    
 
 # Links
 
