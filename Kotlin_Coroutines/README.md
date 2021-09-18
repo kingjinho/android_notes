@@ -127,17 +127,80 @@
         - The child coroutine is started from the scope corresponding the parent coroutine
     - Possible to create a new scope without starting a new coroutine
         - Use of `coroutineScope`
-    
-Structured Concurrency
-    - The mechanism providing the structure of coroutine
-    - Benefits
-        - Scope is generally responsible for child coroutines, and their lifetime is attached to the
-    lifetime of the scope
-        - Scope can automatically cancel child coroutines if something goes wrong or user revokes operation
-        - Scope automatically waits for completion of all the child coroutines.
-            - If the scope corresponds to a coroutine, then the parent coroutine does not complete until all
-        the coroutines launched in its scope are complete                
-    
+
+Structured Concurrency - The mechanism providing the structure of coroutine - Benefits - Scope is generally responsible
+for child coroutines, and their lifetime is attached to the lifetime of the scope - Scope can automatically cancel child
+coroutines if something goes wrong or user revokes operation - Scope automatically waits for completion of all the child
+coroutines. - If the scope corresponds to a coroutine, then the parent coroutine does not complete until all the
+coroutines launched in its scope are complete - The new scope created by the `coroutineScope` or by the coroutine
+builders, always inherits the context from the outer scope - All the nested coroutines are automatically started with
+the inherited context - And the dispatcher is a part of this context - With structured concurrency, we can specify major
+context elements(like dispatcher) once, when we create a top-level coroutine. All the nested coroutines then inherit the
+context and modify it only if needed - In Android, it is common practice to use `Main` by default for the top coroutine.
+
+- And then to explicitly put a different dispatcher when we need to run code on different thread -
+
+- Channels
+    - `Coroutines can communicate with each other via channels`
+    - It is communication primitives that allows us to pass data between different coroutines
+    - One can send information while the other can receive it
+    - Producer: coroutine that sends information
+    - Consumer: coroutine that receives information
+    - N : N relationship
+
+    - When many coroutines receive information from the same channel, each element is handled only by one of the
+      consumers
+        - Handling it automatically means removing this element from the channel
+    - Channel is similar to a collection of elements(queue)
+        - However, the main different is that unlike collections, even in synchronized versions
+          a `channel can suspend send and receive` operations, depending on whether channel is empty or full
+    - Channel is represented by 3 interfaces
+        - `sendChannel`
+            - Create a channel and give it to coroutine as `SendChannel` instance
+            - Send only
+            - Can close a channel to indicate no more elements are coming
+        - `receiveChannel`
+            - Create a channel and give it to coroutine as `ReceiveChannel` instance
+            - Receive only
+        - `Channel` which extends the first two
+    - Coroutines library has several types of channels
+        - Differ in how many elements they can internally store, and whether the send call can suspend or not
+    - For all channel types, the `receive` call behaves in the same manner
+        - It receives when the channel is not empty, otherwise suspends
+    - Types of Channel
+        - Unlimited Channel
+            - The closest analog to queue
+            - Producer can send elements to channel, and channel will grow infinitely
+            - `send` call will never be suspended
+            - If no memory, `OutOfMemory Exception`
+            - Difference with a queue?
+                - When consumer tries to receive from an empty channel and suspended until new elements are sent
+        - Buffered Channel
+            - Has size constraint by number
+            - Producer can send element until channel reaches its maximum capacity
+            - All elements are internally stored
+            - When full, next send call will be suspended until channel has free space
+        - Rendezvous Channel
+            - A channel without buffer
+            - Channel with size of zero
+            - Either `send or receive will always be suspended` until the other is called
+                - If `send` is called and no suspended `receive` call ready to process, then `send` suspend
+                - If `receive` is called and the channel is empty(meaning no suspended send call), then `receive` suspend
+            - `Both send and receive should meet on time`
+        - Conflated Channel
+            - A new element sent to this channel will overwrite the previously sent elements
+                - Thus, receiver only gets the latest element
+            - `send` call will never suspended
+          
+        - Example of Instantiating Channel
+         ```kotlin
+        //When we take a lookg at Channel, by default it is rendezvous
+            val rendezvousChannel = Channel<String>()
+            val bufferedChannel = Channel<String>(10)
+            val conflatedChannel = Channel<String>(CONFLATED)
+            val unlimitedChannel = Channel<String>(UNLIMITED)
+        ```
+        
 
 # Links
 
