@@ -1,21 +1,21 @@
 # Splash Screen
 
 
-1. [What is Splash Screen?](#What-is-Splash-Screen?)
-2. [Why using Splash Screen?](#Why-using-Splash-Screen?)
+1. [What is Splash Screen](#What-is-Splash-Screen)
+2. [Why using Splash Screen](#Why-using-Splash-Screen)
 3. [Implementation](#Implementation)
 4. [How it works](#How-it-works)
 5. [Components of Splash Screen](#Components-of-Splash-Screen)
 6. [Dimension](#Dimension)
-7. [Animation, and its launch sequence](#Animation,-and-its-launch-sequence)
+7. [Animation and its launch sequence](#Animation-and-its-launch-sequence)
 ---
 
-# What is Splash Screen?
+# What is Splash Screen
 - **First Screen** user meets when launching an app
 - Contains app icon, animation
 
 
-# Why using Splash Screen?
+# Why using Splash Screen
 - Deliver positive first impression
 - Unique branding purpose(either your app, or Company)
 
@@ -55,7 +55,7 @@
 - App icon w/o background: 288 X 288dp, fit within a circle of 192dp in diameter
 - If specification is not met, anything outside a circle will be masked
 
-# Animation, and its launch sequence
+# Animation and its launch sequence
 - Animated is embedded within the following launch sequences:
     1. Enter Animation
        - Not customizable since it is controlled by the system
