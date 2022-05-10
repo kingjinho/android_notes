@@ -8,6 +8,7 @@
 5. [Components of Splash Screen](#Components-of-Splash-Screen)
 6. [Dimension](#Dimension)
 7. [Animation and its launch sequence](#Animation-and-its-launch-sequence)
+8. [Customize Splash Screen](#Customize-Splash-Screen)
 ---
 
 # What is Splash Screen
@@ -76,6 +77,22 @@
         - Animated Vector Drawable(AVD) format
         - AVD should be four times the size of an adaptive icon
         - Not exceeding 1000ms on phones
+
+# Customize Splash Screen
+- Default behavior
+    - Splash screen uses `windowBackground` of app theme if it's a single color and the launcher icon
+- How to customize?
+    - By adding attributes to the app theme
+- What can be customized?
+    1. appearance with theme attributes
+    2. Splash screen stays longer
+    3. Animation of dismissing the splash screen
+
+- How to customize Splash Screen?
+    - Android 12 or higher
+        
+    - Android 11 or lower
+    
     
 # FYI
 - User perceived startup time is less with animated splash screen
