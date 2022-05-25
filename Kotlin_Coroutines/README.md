@@ -8,10 +8,25 @@
 
 # How did we implement Asynchronous Programming?
 
-- Creating Threads,
--
+- Creating Threads
+- Callback
 
 # Why using Coroutines?
+- Concurrency
+  - Long time ago, Computer can do only one thing
+    - `When downloading, just download`
+  - Without concurrency -> resource waste
+- Parallelism
+  - SMP
+    - Symmetric Multiprocessor
+        - Multiple processes use one memory
+        - Multiple processes work at once
+    - Problem with SMP
+        - Visibility: Multiple CPU using separate cache -> Lock, memory barrier
+        - Cache = Collection of cache line(64 or 128 byte)
+            - Multiple cores cannot access to same cache line to update data at once
+                - Has to wait
+- Why Coroutines
 
 # What is Coroutine?
 
@@ -80,8 +95,9 @@
 
 ## Coroutine Scope & Coroutine Context (Important)
 
-- Coroutine Scope
+- CoroutineScope
     - `Responsible for the structure and parent-child relationships between different coroutines`
+    - `Start of every coroutine`
 
 - Coroutine has to start inside a scope
 
