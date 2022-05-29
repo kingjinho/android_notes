@@ -3,8 +3,8 @@
 # Concept of Asynchronous Programming
 
 - These days, we have multiple processor cores
-- Why should wait for something when we could do something else?
-- This is the basis of asynchronous programming
+- Basis of asynchronous programming
+    - `Why should wait for something when we could do something else?`
 
 # How did we implement Asynchronous Programming?
 
@@ -26,7 +26,6 @@
         - Cache = Collection of cache line(64 or 128 byte)
             - Multiple cores cannot access to same cache line to update data at once
                 - Has to wait
-- Why Coroutines
 
 # What is Coroutine?
 
@@ -53,8 +52,8 @@
 ## Suspend & Resume
 
 - Function with suspend keyword
-- When code block encounters function with suspend keyword, the whole block of computation is paused, corresponding
-  function is suspended until it gets finished, and removed from thread and stored in memory
+- `When code block encounters function with suspend keyword, the whole block of computation is paused, corresponding
+  function is suspended until it gets finished, and removed from thread and stored in memory`
 - When suspending function finished, the whole block continues its computation
 
 ## How to start a coroutines?
@@ -144,17 +143,25 @@
     - Possible to create a new scope without starting a new coroutine
         - Use of `coroutineScope`
 
-Structured Concurrency - The mechanism providing the structure of coroutine - Benefits - Scope is generally responsible
-for child coroutines, and their lifetime is attached to the lifetime of the scope - Scope can automatically cancel child
-coroutines if something goes wrong or user revokes operation - Scope automatically waits for completion of all the child
-coroutines. - If the scope corresponds to a coroutine, then the parent coroutine does not complete until all the
-coroutines launched in its scope are complete - The new scope created by the `coroutineScope` or by the coroutine
-builders, always inherits the context from the outer scope - All the nested coroutines are automatically started with
-the inherited context - And the dispatcher is a part of this context - With structured concurrency, we can specify major
-context elements(like dispatcher) once, when we create a top-level coroutine. All the nested coroutines then inherit the
-context and modify it only if needed - In Android, it is common practice to use `Main` by default for the top coroutine.
+Structured Concurrency 
+- The mechanism providing the structure of coroutine 
+- Benefits 
+    - Scope is generally responsible for child coroutines, and their lifetime is attached to the lifetime of the scope 
+    - Scope can automatically cancel child coroutines if something goes wrong or user revokes operation 
+    - Scope automatically waits for completion of all the child coroutines. 
+    - If the scope corresponds to a coroutine, then the parent coroutine does not complete until all the
+coroutines launched in its scope are complete 
+    - The new scope created by the `coroutineScope` or by the coroutine
+builders, always inherits the context from the outer scope 
+    - All the nested coroutines are automatically started with
+the inherited context - And the dispatcher is a part of this context 
+    - With structured concurrency, we can specify major
+context elements(like dispatcher) once, when we create a top-level coroutine. 
+      All the nested coroutines then inherit the
+context and modify it only if needed 
+    - In Android, it is common practice to use `Main` by default for the top coroutine.
 
-- And then to explicitly put a different dispatcher when we need to run code on different thread -
+- And then to explicitly put a different dispatcher when we need to run code on different thread
 
 - Channels
     - `Coroutines can communicate with each other via channels`
