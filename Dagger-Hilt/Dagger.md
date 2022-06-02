@@ -89,7 +89,7 @@ interface AppContainer {
 
 > How?
 
-### How?
+### How? @Module
 
 - `Need Dagger Module`
 - `Dagger Module tells Dagger about how to provide instances of a certain type`
@@ -147,3 +147,114 @@ interface AppContainer {
     fun inject(foo: ClassThatHasDependency)
 }
 ```
+
+### @BindsInstance
+
+- Instances that are provided by the Android system are constructed outside the graph
+- However, these are available already when creating a graph
+```kotlin
+@Component(modules = [StorageModule::class])
+interface AppComponent {
+
+    // Factory to create instances of the AppComponent
+    @Component.Factory
+    interface Factory {
+        // With @BindsInstance, the Context passed in will be available in the graph
+        fun create(@BindsInstance context: Context): AppComponent
+    }
+
+    fun inject(activity: RegistrationActivity)
+}
+
+```
+- @BindsInstance tells Dagger that it needs to add instance in the graph
+  - Whenever parameter is needed, provide it
+- `@BindsInstance for object that are created outside the graph(i.e., Context)`
+
+
+## Injecting graph(component) into an Activity
+- In Android, you usually create a Dagger graph that lives in your application since you want the graph to be in
+memory as long as the app is running(lifecycle)
+```kotlin
+open class MyApplication : Application() {
+    // Instance of the AppComponent that will be used by all the Activities in the project
+    val appComponent: AppContainer by lazy {
+        // Creates an instance of AppComponent using its Factory constructor
+        // We pass the applicationContext that will be used as Context in the graph
+        DaggerAppContainer.factory().create(applicationContext)
+    }
+}
+```  
+
+- Since we declare a container with factory method, just call relevant method in activity's onCreate()
+```kotlin
+class ClassThatHasDependency: AppCompatActivity(){
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+      ...
+      /**
+       * remember on AppContainer interface with @Component annotation, declaring a function with parameter 
+       * indicates a type of parameter needs DI
+       * 
+       * note: call before super.onCreate(savedInstance) to avoid issues with fragment restoration
+       * activity during the restore phase will attach fragments that might want to access activity bindings
+       */
+      
+      (application as MyApplication).appComponent.inject(this)
+      
+      super.onCreate(savedInstanceState)
+      ...
+    }
+    
+}
+```
+
+## Scoping
+- Sometimes, same instance of a dependency needs to be injected in a Component:
+  - When other types that use same dependency share the same instance
+  - When an object creation is very expensive, and you don't want to create new instance every time App needs it as
+  a dependency
+- Use Scope to provide unique instance of a dependency in a Component
+### @Singleton
+- When annotating a Component with `@Singleton`, all the classes also annotated with `@Singleton` will be
+scoped to its lifetime
+  
+## Subcomponent
+- Fragment
+  - inject Dagger in onAttach() after calling super
+- Scope to part
+- Tell dagger that we want to use a new Component to use part of another Component
+  - Inherit and extend the object graph of a parent component
+```kotlin
+@Subcomponent
+interface SubComponent {
+    //should contain subcomponent specific information
+    
+    @Subcomponent.Factory
+    interface Factory {
+        fun create(): SubComponent
+    }
+}
+
+@Singleton
+@Component
+interface MainComponent {
+    
+    //allows retrieving types from the graph 
+    fun injectSubcomponent(): SubComponent.Factory
+    //allows field injection in that parameter
+    fun inject(foo: ClassHasDependency)
+}
+```  
+
+## Scoping Subcomponents
+- Using @Singleton?
+  - No, because it's been used by AppContainer
+- Scoping rules
+  - When a type is marked with a scope annotation, it can only be used by Components that are annotated with the
+  same scope
+  - When a Component is marked with a scope annotation, it can only provide types with that annotation or
+  types that have no annotation
+  - a Subcomponent cannot use a scope annotation used by one of its parent Components
+
+  
