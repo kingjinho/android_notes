@@ -105,7 +105,7 @@
         - Such as `coroutine custom name`, `Dispatcher specifying the threads the coroutine should be scheduled on`
 
 - When using `launch, async and runblocking` to start a coroutine, we automatically create the corresponding scope
-    - All these receive lambda and implicit receiver type `coroutieScope`
+    - All these receive lambda and implicit receiver type `coroutineScope`
     - Coroutines can only start in coroutine scope
     - `launch, async` are extensions of CoroutineScope, Implicit and explicit receiver(scope) must be passed
   ```kotlin
